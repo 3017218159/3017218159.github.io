@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>拼图游戏</title>
+    <link href='http://fonts.googleapis.com/css?family=Lustria|Niconne|McLaren' rel='stylesheet' type='text/css'>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+    <style>
+        #result{
+            font-family: 'McLaren', cursive;
+            font-size: 24px;
+            color: #e6e6e6;
+            font-weight: inherit;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+        #picture{
+            position: relative;
+            width: 348px;
+            height: 348px;
+            margin-bottom: 30px;
+        }
+        #restart{
+            cursor: pointer;
+            width: 10%;
+            margin-left: 45%;
+            background-color: #7fa503;
+            font-family: 'McLaren', cursive;
+            font-size: 20px;
+            color: #e6e6e6;
+            font-weight: inherit;
+            text-transform: uppercase;
+            box-shadow: 1px 1.5px 6px rgb(251, 255, 0);
+        }
+        #restart:hover{
+            color:#676767;
+            transform:scale(1.1);
+        }
+        #picture, #result, #restart{
+            margin-top: 3%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .picture_part0{
+            background: url(https://m.qpic.cn/psb?/V10H3jji2hUdA1/NFzHpqCVcfDq2rnodeWtHqcEenLIXmj9X6vcJJZbcTI!/b/dNEAAAAAAAAA&bo=XgFjAV4BYwERCT4!&rf=viewer_4)no-repeat;
+        }
+        .picture_part1{
+            background: url(https://m.qpic.cn/psb?/V10H3jji2hUdA1/NFzHpqCVcfDq2rnodeWtHqcEenLIXmj9X6vcJJZbcTI!/b/dNEAAAAAAAAA&bo=XgFjAV4BYwERCT4!&rf=viewer_4)no-repeat;
+        }
+        .picture_part0, .picture_part1{
+            transition-duration: 0.2s;
+            position: absolute;
+            border: solid 1px #969696;
+            display: inline-block;
+            width: 116px;
+            height: 116px;
+            margin-bottom: -4px;
+            opacity: 0.9;
+        }
+        .picture_part:hover{
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .position_1, .position_2, .position_3 {
+            top: 0px;
+        }
+
+        .position_4, .position_5, .position_6 {
+            top: 116px;
+        }
+
+        .position_7, .position_8, .position_9 {
+            top: 232px;
+        }
+
+        .position_1, .position_4, .position_7 {
+            left: 0px;
+        }
+
+        .position_2, .position_5, .position_8 {
+            left: 116px;
+        }
+
+        .position_3, .position_6, .position_9 {
+            left: 232px;
+        }
+
+        #_position_1 {
+            background-position: 0px 0px;
+        }
+
+        #_position_2 {
+            background-position: -116px 0px;
+        }
+
+        #_position_3 {
+            background-position: -232px 0px;
+        }
+
+        #_position_4 {
+            background-position: -0px -116px;
+        }
+
+        #_position_5 {
+            background-position: -116px -116px;
+        }
+
+        #_position_6 {
+            background-position: -232px -116px;
+        }
+
+        #_position_7 {
+            background-position: -0px -232px;
+        }
+
+        #_position_8 {
+            background-position: -116px -232px;  
+        }
+
+        #_position_9 {
+            opacity: 0;
+            background-position: -116px -232px;
+            background-image: none;
+        }
+    </style>
+</head>
+<body>
+    <div style="width:728px;height:90px;margin:0 auto;">
+     
+    </div>
+    <header class="wrapperContainer">
+        <div class="wrapper">
+            <div>
+                <div class="logo">
+                    <h1><a href="">Picture<br><span>Game</span></a></h1>
+                    <div class="logoTriangle"></div>
+                </div>
+                <!--导航-->
+                <nav>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="">博客</a></li>
+                        <li><a href="photo.html">照片墙</a></li>
+                        <li class="active"><a href="">拼图游戏</a></li>
+                        <li><a href="class.html">课程表</a></li>
+                    </ul>
+                </nav>
+                <div class="clearfloat"></div>
+            </div>
+            <div class="clearfloat"></div>
+        </div>
+    </header>
+    <div class="wrapperContainer">
+        <div class="wrapper">
+            <!--begin Welcome-->
+            <div class="welcome">
+                <h2>拼图游戏</h2>
+                <div id="result"></div>
+                <div id="picture"></div>
+                <div id="restart">开始</div>
+            </div>
+            <!--end Welcome-->
+        </div>
+    </div>
+    <script>
+        var stepNum = 0;
+        var isCheck = 0;
+        window.onload = function(){
+            create_pic();
+            document.getElementById('restart').addEventListener("click", random_pic);
+        }
+        function check_random_isValid() {
+            var count = 0;
+            for (var i = 0; i < 9; i++) {
+                for (var j = i+1; j < 9; j++) {
+                    if (random_arr[j] < random_arr[i]) {
+                        count++;
+                    }
+                }
+            }
+            return count%2===0;
+        }
+        var count = 0;
+        function create_pic(){
+            picture = document.getElementById("picture");
+            for (var i = 1; i <= 9; i++) {
+                var part = document.createElement("div");
+                part.addEventListener("click", pic_move);
+                part.className = "picture_part" + count + " position_"+i;
+                picture.appendChild(part);
+                part.id = "_position_"+i;
+            }
+            stepNum = 0;
+            document.getElementById("result").innerText = "步数：" + stepNum;
+        }
+        function pic_move(event) {
+            var blank_pic_offset = document.getElementById("_position_9");
+            var blank_pic_offset_top = blank_pic_offset.offsetTop;
+            var blank_pic_offset_left = blank_pic_offset.offsetLeft;
+            var _offset_top = this.offsetTop;
+            var _offset_left = this.offsetLeft;
+            /* 判断点击的图片块是否与空格块相邻 */
+            if ((Math.abs(blank_pic_offset_top-_offset_top) == 116 && blank_pic_offset_left == _offset_left) ||
+                (Math.abs(blank_pic_offset_left-_offset_left) == 116 && blank_pic_offset_top == _offset_top)) {
+                var str = blank_pic_offset.className;
+                blank_pic_offset.className = this.className;
+                this.className = str;
+                check(); // 检查是否还原原图
+            }
+        }
+        function random_pic(event) {
+            stepNum = 0;
+            isCheck = 1;
+            document.getElementById("result").innerText = "步数：" + stepNum;
+            /* 产生随机数列前先将拼图块对应的位置复位 */
+            for (var k = 1; k <= 9; k++) {
+                document.getElementById("_position_"+k).className="picture_part"+count+" position_"+k;
+            }
+            var part = document.getElementById("picture").childNodes;
+            random_arr = [];
+            for (var j = 0; j < 8; j++) {
+                random_arr[j] = j+1;
+            }
+            /* 利用sort和cmp进行随机打散 */
+            function cmp() { return 0.5-Math.random(); }
+            while(1) {
+                random_arr.sort(cmp);
+                if (check_random_isValid()) {
+                    break;
+                }
+            }
+            /* 通过更改类名来改变位置 */
+            for (var i = 0; i < 8; i++) {
+                part[i].className = "picture_part" + count + " position_" + random_arr[i];
+            }
+        }
+        function check() {
+            if(isCheck == 0){
+                return;
+            }
+            stepNum += 1;
+            for (var i = 1; i <= 9; i++) {
+                var item = document.getElementById("_position_"+i);
+                if (item.className != "picture_part" + count +" position_"+i &&
+                    item.className != "picture_part0" + " position_" + i + " picture_part1") {
+                    document.getElementById("result").innerText = "步数：" + stepNum;
+                    return;
+                }
+            }
+            document.getElementById("result").innerText = "You Win!";
+            isCheck = 0;
+        }
+    </script>
+    <div class="clearfloat"></div>
+    <div class="wrapperContainer">
+        <footer>
+            <p>
+                Copyright &copy; <a href="https://user.qzone.qq.com/1010043642?source=friendlist">李琛</a>
+            </p>
+            <div class="clearfloat"></div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>课程表</title>
+    <link href='http://fonts.googleapis.com/css?family=Lustria|Niconne|McLaren' rel='stylesheet' type='text/css'>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div style="width:728px;height:90px;margin:0 auto;">
+
+    </div>
+    <header class="wrapperContainer">
+        <div class="wrapper">
+            <div>
+                <div class="logo">
+                    <h1><a href="index.html">Time<br><span>Table</span></a></h1>
+                    <div class="logoTriangle"></div>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="">博客</a></li>
+                        <li><a href="photo.html">照片墙</a></li>
+                        <li><a href="game.html">拼图游戏</a></li>
+                        <li class="active"><a href="">课程表</a></li>
+                    </ul>
+                </nav>
+                <div class="clearfloat"></div>
+            </div>
+            <div class="clearfloat"></div>
+        </div>
+    </header>
+    <div class="wrapperContainer">
+        <div class="wrapper">
+            <div class="welcome">
+                <table border="1">
+                    <caption>课程表</caption>
+                    <tr>
+                        <th></th>
+                        <th>周一</th>
+                        <th>周二</th>
+                        <th>周三</th>
+                        <th>周四</th>
+                        <th>周五</th>
+                        <th>周六</th>
+                        <th>周日</th>
+                    </tr>
+
+                    <?php
+                        //连接数据库并初始化
+                        require "dbconf.php";
+                        $link = @mysqli_connect(HOST, USER, PASS) or die("提示：数据库连接失败！");
+                        //if($link) echo "<tr><td>nb</td></tr>";
+
+                        mysqli_select_db($link, DBNAME);
+                        mysqli_set_charset($link, 'utf8');
+
+                        //拉取数据
+                        $sql = 'select * from lesson order by starttime, date asc';
+                        $result = mysqli_query($link, $sql);
+                        $arr = array(
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0),
+                            array(0, 0, 0, 0, 0, 0, 0)
+                        );
+                        $num = mysqli_num_rows($result);
+                        $isFetch = 1;
+                        for($i = 0; $i < 12; $i++){
+                            $rowNum = $i + 1;
+                            echo "<tr><td>$rowNum</td>";
+                            for($k = 0; $k >= 0; $k++){
+                                if($isFetch == 1){
+                                    $row = mysqli_fetch_assoc($result);
+                                    $isFetch = 0;
+                                }
+                                
+                                for($j = 0; $j < 7; $j++){
+                                    if($row['starttime'] == $i+1 && $row['date'] == $j+1){
+                                        for($x = 0; $x < $row['lasttime']; $x++){
+                                            $arr[$i+$x][$j] = 1;
+                                        }
+                                        echo "<td rowspan='$row[lasttime]'>$row[name]</td>";
+                                        $isFetch = 1;
+                                        break;
+                                    }
+                                    if($arr[$i][$j] == 0){
+                                        echo "<td></td>";
+                                        $arr[$i][$j] = 1;
+                                    }
+                                }
+                                if($arr[$i][6] == 1){
+                                    break;
+                                }
+                            }
+                            echo "</tr>";
+                        }
+
+                        mysqli_free_result($result);
+                        mysqli_close($link);
+                    ?>
+                </table>
+                
+                <div class="clearfloat"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="clearfloat"></div>
+    <div class="wrapperContainer">
+        <footer>
+            <p>
+                Copyright &copy; <a href="https://user.qzone.qq.com/1010043642?source=friendlist">李琛</a>
+            </p>
+            <div class="clearfloat"></div>
+        </footer>
+    </div>
+    
+</body>
+</html>
